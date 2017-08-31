@@ -16,8 +16,8 @@ if [ ! "$(docker ps -q -f name=vespa)" ]; then
 	docker run --detach --name vespa --hostname vespa-container --privileged --volume $PWD/sample-apps:/vespa-sample-apps --publish 8080:8080 vespaengine/vespa
 fi
 
-echo "Waiting 10 seconds for Vespa config server to start up"
-sleep 10
+echo "Waiting 20 seconds for Vespa config server to start up"
+sleep 20
 
 docker exec vespa sh -c "/opt/vespa/bin/vespa-deploy prepare /vespa-sample-apps/basic-search/src/main/application && /opt/vespa/bin/vespa-deploy activate"
 
