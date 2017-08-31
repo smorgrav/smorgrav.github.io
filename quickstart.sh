@@ -13,11 +13,14 @@ if [ ! "$(docker ps -q -f name=vespa)" ]; then
     if [ "$(docker ps -aq -f status=exited -f name=vespa)" ]; then
         docker rm vespa
     fi
-	docker run --detach --name vespa --hostname vespa-container --privileged --volume $PWD/sample-apps:/vespa-sample-apps --publish 8080:8080 vespaengine/vespa
+	docker run --detach --name vespa --hostname vespa-container --privileged --volume $PWD/sample-apps:/vespa-sample-apps --publish 8080:8080 --publish 19071:19071 vespaengine/vespa
 fi
 
-echo "Waiting 20 seconds for Vespa config server to start up"
-sleep 20
+echo "Waiting for Vespa config server to start up"
+until $(curl --output /dev/null --fail -s --head http://localhost:19071/state/v1/health); do
+    printf '.'
+    sleep 5
+done
 
 docker exec vespa sh -c "/opt/vespa/bin/vespa-deploy prepare /vespa-sample-apps/basic-search/src/main/application && /opt/vespa/bin/vespa-deploy activate"
 
